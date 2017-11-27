@@ -1,0 +1,35 @@
+{
+  "name": "gendiff-maxjs",
+  "version": "0.0.1",
+  "bin": {
+    "gendiff": "dist/bin/gendiff.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maximjs/project-lvl2-s161"
+  },
+  "author": "Maxim Kozlyakov",
+  "devDependencies": {
+    "babel-cli": "*",
+    "babel-core": "*",
+    "babel-eslint": "^8.0.1",
+    "babel-preset-env": "*",
+    "babel-preset-stage-0": "*",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  },
+  "scripts": {
+    "babel-node": "babel-node",
+    "build": "set NODE_ENV=production && babel src --out-dir dist --source-maps inline",
+    "prepublish": "npm run build",
+    "eslint": "eslint src/",
+    "run": "npm run babel-node -- src/bin/gendiff.js -h"
+  },
+  "dependencies": {
+    "commander": "^2.12.1"
+  }
+}
