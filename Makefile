@@ -9,3 +9,5 @@ publish:
 	npm publish
 run:
 	npm run run
+test:
+	npm test

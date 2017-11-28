@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-import program from '../application';
+import { runGenDiff } from '..';
 
-program.parse(process.argv);
+runGenDiff(process.argv);

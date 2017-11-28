@@ -1,9 +1,10 @@
 {
   "name": "gendiff-maxjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "bin": {
     "gendiff": "dist/bin/gendiff.js"
   },
+  "main": "dist/index.js",
   "files": [
     "dist"
   ],
@@ -20,14 +21,16 @@
     "babel-preset-stage-0": "*",
     "eslint": "^4.10.0",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-import": "^2.8.0",
+    "jest": "^21.2.1"
   },
   "scripts": {
     "babel-node": "babel-node",
     "build": "set NODE_ENV=production && babel src --out-dir dist --source-maps inline",
     "prepublish": "npm run build",
     "eslint": "eslint src/",
-    "run": "npm run babel-node -- src/bin/gendiff.js -h"
+    "run": "npm run babel-node -- src/bin/gendiff.js -h",
+    "test": "jest"
   },
   "dependencies": {
     "commander": "^2.12.1"
