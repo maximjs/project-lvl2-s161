@@ -2,11 +2,13 @@ import path from 'path';
 import fs from 'fs';
 import _ from 'lodash';
 import yaml from 'js-yaml';
+import ini from 'ini';
 
 const getContent = (pathToFile1, pathToFile2) => {
   const parser = {
     '.json': (path1) => JSON.parse(fs.readFileSync(path.normalize(path1), 'utf8')),
     '.yml': (path2) => yaml.safeLoad(fs.readFileSync(path.normalize(path2), 'utf8')),
+    '.ini': (path2) => ini.parse(fs.readFileSync(path.normalize(path2), 'utf8')),
   };
   const typeFile1 = path.parse(pathToFile1).ext;
   const typeFile2 = path.parse(pathToFile2).ext;
