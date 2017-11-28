@@ -1,10 +1,26 @@
 import path from 'path';
 import fs from 'fs';
 import _ from 'lodash';
+import yaml from 'js-yaml';
 
 const gendiff = (pathToFile1, pathToFile2) => {
-  const contentFile1 = JSON.parse(fs.readFileSync(path.normalize(pathToFile1), 'utf8'));
-  const contentFile2 = JSON.parse(fs.readFileSync(path.normalize(pathToFile2), 'utf8'));
+  const getContent = (path1, path2) => {
+    const typeFile1 = path.parse(path1).ext;
+    const typeFile2 = path.parse(path2).ext;
+
+    if (typeFile1 === '.json' && typeFile2 === '.json') {
+      const contentFile1 = JSON.parse(fs.readFileSync(path.normalize(path1), 'utf8'));
+      const contentFile2 = JSON.parse(fs.readFileSync(path.normalize(path2), 'utf8'));
+      return [contentFile1, contentFile2];
+    }
+    if (typeFile1 === '.yml' && typeFile2 === '.yml') {
+      const contentFile1 = yaml.safeLoad(fs.readFileSync(path.normalize(path1), 'utf8'));
+      const contentFile2 = yaml.safeLoad(fs.readFileSync(path.normalize(path2), 'utf8'));
+      return [contentFile1, contentFile2];
+    }
+  };
+
+  const [contentFile1, contentFile2] = getContent(pathToFile1, pathToFile2);
   const commonKeys = _.union(Object.keys(contentFile1), Object.keys(contentFile2));
 
   const diffCommonKeys = commonKeys.reduce((acc, el) => {
