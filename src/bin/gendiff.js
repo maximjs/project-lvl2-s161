@@ -10,8 +10,11 @@ const runGenDiff = (params) => {
     .description('Compares two configuration files and shows a difference.')
     .option('-f, --format [type]', 'Output format')
     .action((file1, file2) => {
-      const diff = gendiff(file1, file2);
-      console.log(diff);
+      if (program.format) {
+        console.log(gendiff(file1, file2, program.format));
+      } else {
+        console.log(gendiff(file1, file2));
+      }
     });
   program.parse(params);
 };

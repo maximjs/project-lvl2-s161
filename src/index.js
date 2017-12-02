@@ -89,16 +89,17 @@ const simpleTypesRender = [
   },
 ];
 
+
 const objRender = (node, tabsGroupEl) => Object.keys(node).map(key => `${tabsGroupEl}${key}: ${node[key]}`).join('\n');
 
-const renderDiff = (ast, tabs = 1) => {
+const renderNestedDiff = (ast, tabs = 1) => {
   const tabsSpace = ' '.repeat(tabs * 4);
   const tabsDiff = ' '.repeat((tabs * 4) - 2);
   const tabsGroupEl = ' '.repeat((tabs + 1) * 4);
 
   const diffText = ast.map((node) => {
     if (node.type === 'nested') {
-      return `${tabsSpace}${node.name}: {\n${renderDiff(node.value, tabs + 1)}\n${tabsSpace}}`;
+      return `${tabsSpace}${node.name}: {\n${renderNestedDiff(node.value, tabs + 1)}\n${tabsSpace}}`;
     }
     if (node.type === 'deleted') {
       if (_.isObject(node.value)) {
@@ -117,9 +118,42 @@ const renderDiff = (ast, tabs = 1) => {
   return diffText.join('\n');
 };
 
-const gendiff = (pathToFile1, pathToFile2) => {
+
+const getMainStr = (property, propertyType) => `Property '${property}' was ${propertyType}`;
+const getFromStr = (from, to) => `. From ${from} to ${to}`;
+const getWithStr = valueStr => ` with ${valueStr}`;
+
+const renderPlainDiff = (ast, prop = '') => {
+  const diffText = ast.map((node) => {
+    const property = `${prop}${node.name}`;
+
+    if (node.type === 'nested') {
+      return renderPlainDiff(node.value, `${property}.`);
+    }
+    if (node.type === 'deleted') {
+      return getMainStr(property, 'removed');
+    }
+    if (node.type === 'inserted') {
+      if (_.isObject(node.value)) {
+        return `${getMainStr(property, 'added')}${getWithStr('complex value')}`;
+      }
+      return `${getMainStr(property, 'added')}${getWithStr(`value: ${node.value}`)}`;
+    }
+    if (node.type === 'changed') {
+      return `${getMainStr(property, 'updated')}${getFromStr(node.value.old, node.value.new)}`;
+    }
+    return '';
+  });
+
+  return diffText.filter(el => el !== '').join('\n');
+};
+
+const gendiff = (pathToFile1, pathToFile2, format = null) => {
   const diffAst = makeAst(...getContent(pathToFile1, pathToFile2));
-  return `{\n${renderDiff(diffAst)}\n}`;
+  if (format === 'plain') {
+    return renderPlainDiff(diffAst);
+  }
+  return `{\n${renderNestedDiff(diffAst)}\n}`;
 };
 
 export default gendiff;
