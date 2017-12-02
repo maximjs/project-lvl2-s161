@@ -8,6 +8,7 @@ const result3 = fs.readFileSync(path.normalize('__tests__/__fixtures__/result_fl
 const result4 = fs.readFileSync(path.normalize('__tests__/__fixtures__/result_nested_json.txt'), 'utf8');
 const result5 = fs.readFileSync(path.normalize('__tests__/__fixtures__/result_nested_yml.txt'), 'utf8');
 const result6 = fs.readFileSync(path.normalize('__tests__/__fixtures__/result_nested_ini.txt'), 'utf8');
+const result7 = fs.readFileSync(path.normalize('__tests__/__fixtures__/result_format_plain_json.txt'), 'utf8');
 
 test('Comparison of flat files (json)', () => {
   expect(gendiff('__tests__/__fixtures__/before_flat.json', '__tests__/__fixtures__/after_flat.json'))
@@ -37,4 +38,9 @@ test('Comparison of nested files (yaml)', () => {
 test('Comparison of nested files (ini)', () => {
   expect(gendiff('__tests__/__fixtures__/before_nested.ini', '__tests__/__fixtures__/after_nested.ini'))
     .toBe(result6);
+});
+
+test('Comparison of nested files with command -f plain (json)', () => {
+  expect(gendiff('__tests__/__fixtures__/before_nested.json', '__tests__/__fixtures__/after_nested.json', 'plain'))
+    .toBe(result7);
 });
