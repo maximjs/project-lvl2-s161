@@ -4,27 +4,23 @@ import _ from 'lodash';
 import yaml from 'js-yaml';
 import ini from 'ini';
 
-const contentFile = (pathToFile) => fs.readFileSync(path.normalize(pathToFile), 'utf8');
+const contentFile = pathToFile => fs.readFileSync(path.normalize(pathToFile), 'utf8');
 
-const getContent = (pathToFile1, pathToFile2) => {
-  const parser = {
-    '.json': (content) => JSON.parse(content),
-    '.yml': (content) => yaml.safeLoad(content),
-    '.ini': (content) => ini.parse(content),
-  };
-  const typeFile1 = path.parse(pathToFile1).ext;
-  const typeFile2 = path.parse(pathToFile2).ext;
-  const contentFile1 = parser[typeFile1](contentFile(pathToFile1));
-  const contentFile2 = parser[typeFile2](contentFile(pathToFile2));
-  return [contentFile1, contentFile2];
+const parser = {
+  '.json': JSON.parse,
+  '.yml': yaml.safeLoad,
+  '.ini': ini.parse,
 };
+
+const getContent = (...pathToFiles) => pathToFiles
+  .map(pathToFile => parser[path.extname(pathToFile)](contentFile(pathToFile)));
 
 const keyTypes = [
   {
     type: 'nested',
-    check: (first, second, key) => (first[key] instanceof Object && second[key] instanceof Object)
+    check: (first, second, key) => (_.isObject(first[key]) && _.isObject(second[key]))
       && !(first[key] instanceof Array && second[key] instanceof Array),
-    process: (first, second, fun) => fun(first, second),
+    process: (first, second, func) => func(first, second),
   },
   {
     type: 'not changed',
@@ -98,17 +94,17 @@ const renderDiff = (ast, tabs = 1) => {
   const tabsDiff = ' '.repeat((tabs * 4) - 2);
   const tabsGroupEl = ' '.repeat((tabs + 1) * 4);
 
-  const diffText = ast.map(node => {
+  const diffText = ast.map((node) => {
     if (node.type === 'nested') {
       return `${tabsSpace}${node.name}: {\n${renderDiff(node.value, tabs + 1)}\n${tabsSpace}}`;
     }
-    if ((node.type === 'deleted' || node.type === 'inserted') && node.value instanceof Object) {
-      const objValue = node.value;
-      const value = Object.keys(objValue).map(key => `${tabsGroupEl}${key}: ${objValue[key]}`).join('\n');
-      if (node.type === 'deleted') {
-        return `${tabsDiff}- ${node.name}: {\n${value}\n${tabsSpace}}`;
-      }
-      return `${tabsDiff}+ ${node.name}: {\n${value}\n${tabsSpace}}`;
+    if (_.isObject(node.value) && node.type === 'deleted') {
+      const valueObjRender = Object.keys(node.value).map(key => `${tabsGroupEl}${key}: ${node.value[key]}`).join('\n');
+      return `${tabsDiff}- ${node.name}: {\n${valueObjRender}\n${tabsSpace}}`;
+    }
+    if (_.isObject(node.value) && node.type === 'inserted') {
+      const valueObjRender = Object.keys(node.value).map(key => `${tabsGroupEl}${key}: ${node.value[key]}`).join('\n');
+      return `${tabsDiff}+ ${node.name}: {\n${valueObjRender}\n${tabsSpace}}`;
     }
     const { render } = simpleTypesRender.find(item => item.type === node.type);
     return `${tabsDiff}${render(node.name, node.value, tabsDiff)}`;
