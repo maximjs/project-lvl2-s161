@@ -89,6 +89,8 @@ const simpleTypesRender = [
   },
 ];
 
+const objRender = (node, tabsGroupEl) => Object.keys(node).map(key => `${tabsGroupEl}${key}: ${node[key]}`).join('\n');
+
 const renderDiff = (ast, tabs = 1) => {
   const tabsSpace = ' '.repeat(tabs * 4);
   const tabsDiff = ' '.repeat((tabs * 4) - 2);
@@ -98,13 +100,15 @@ const renderDiff = (ast, tabs = 1) => {
     if (node.type === 'nested') {
       return `${tabsSpace}${node.name}: {\n${renderDiff(node.value, tabs + 1)}\n${tabsSpace}}`;
     }
-    if (_.isObject(node.value) && node.type === 'deleted') {
-      const valueObjRender = Object.keys(node.value).map(key => `${tabsGroupEl}${key}: ${node.value[key]}`).join('\n');
-      return `${tabsDiff}- ${node.name}: {\n${valueObjRender}\n${tabsSpace}}`;
+    if (node.type === 'deleted') {
+      if (_.isObject(node.value)) {
+        return `${tabsDiff}- ${node.name}: {\n${objRender(node.value, tabsGroupEl)}\n${tabsSpace}}`;
+      }
     }
-    if (_.isObject(node.value) && node.type === 'inserted') {
-      const valueObjRender = Object.keys(node.value).map(key => `${tabsGroupEl}${key}: ${node.value[key]}`).join('\n');
-      return `${tabsDiff}+ ${node.name}: {\n${valueObjRender}\n${tabsSpace}}`;
+    if (node.type === 'inserted') {
+      if (_.isObject(node.value)) {
+        return `${tabsDiff}+ ${node.name}: {\n${objRender(node.value, tabsGroupEl)}\n${tabsSpace}}`;
+      }
     }
     const { render } = simpleTypesRender.find(item => item.type === node.type);
     return `${tabsDiff}${render(node.name, node.value, tabsDiff)}`;
