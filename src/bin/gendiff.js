@@ -5,7 +5,7 @@ import renders from '../renders';
 
 const runGenDiff = (params) => {
   program
-    .version('0.1.2')
+    .version('0.2.0')
     .usage('[options] <firstConfig> <secondConfig>')
     .description('Compares two configuration files and shows a difference.')
     .option('-f, --format [type]', 'Output format (default is nested)')

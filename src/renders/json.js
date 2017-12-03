@@ -1,3 +1,4 @@
 
-const renderJsonDiff = () => 'in developing...';
+const renderJsonDiff = ast => JSON.stringify(ast);
+
 export default renderJsonDiff;

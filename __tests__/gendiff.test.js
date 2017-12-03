@@ -40,3 +40,8 @@ test('Comparison of nested files with command -f plain (json)', () => {
   const result7 = fs.readFileSync(path.normalize(`${fixturesPath}result_format_plain_json.txt`), 'utf8');
   expect(gendiff(`${fixturesPath}before_nested.json`, `${fixturesPath}after_nested.json`, renders.plain)).toBe(result7);
 });
+
+test('Comparison of nested files with command -f json (json)', () => {
+  const result8 = fs.readFileSync(path.normalize(`${fixturesPath}result_format_json_json.txt`), 'utf8');
+  expect(gendiff(`${fixturesPath}before_nested.json`, `${fixturesPath}after_nested.json`, renders.json)).toBe(result8);
+});
